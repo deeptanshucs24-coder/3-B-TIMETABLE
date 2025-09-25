@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>3B Fancy Timetable</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: linear-gradient(to right, #74ebd5, #ACB6E5);
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      text-align: center;
+      padding: 20px;
+      background: #007BFF;
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+    }
+    nav {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 15px;
+    }
+    nav button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      background: #fff;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      transition: 0.2s;
+    }
+    nav button:hover {
+      background: #007BFF;
+      color: white;
+    }
+    #content {
+      padding: 20px;
+    }
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+      text-align: center;
+      transition: transform 0.2s;
+    }
+    .card:hover {
+      transform: scale(1.02);
+    }
+    .highlight {
+      background: #ffe08a !important;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    th, td {
+      padding: 12px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+    th {
+      background: #007BFF;
+      color: white;
+    }
+    /* 🎨 Subject Colors */
+    .subject-DS { background: #4da3ff; color: white; }
+    .subject-OOJ, .subject-OOJLAB { background: #a54cff; color: white; }
+    .subject-SDM { background: #ff944d; color: white; }
+    .subject-COA { background: #28a745; color: white; }
+    .subject-DBMS, .subject-DBMSLAB { background: #ff4d4d; color: white; }
+    .subject-LD { background: #ffc107; color: black; }
+    .subject-USP { background: #795548; color: white; }
+    .subject-FWDLAB { background: #9c27b0; color: white; }
+  </style>
+</head>
+<body>
+
+  <header>📅 3B Class Timetable</header>
+
+  <nav>
+    <button onclick="showHome()">Home</button>
+    <button onclick="showDay('Monday')">Monday</button>
+    <button onclick="showDay('Tuesday')">Tuesday</button>
+    <button onclick="showDay('Wednesday')">Wednesday</button>
+    <button onclick="showDay('Thursday')">Thursday</button>
+    <button onclick="showDay('Friday')">Friday</button>
+    <button onclick="showDay('Saturday')">Saturday</button>
+  </nav>
+
+  <div id="content"></div>
+
+  <script>
+    const schedule = [
+      { day: "Monday", time: "8:00 AM - 8:55 AM", floor: "nil", room: "nil", subject: "nil" },
+      { day: "Monday", time: "8:55 AM - 9:50 AM", floor: "2", room: "210", subject: "DS" },
+      { day: "Monday", time: "10:20 AM - 11:15 AM", floor: "4", room: "LAB-2", subject: "FWD LAB" },
+      { day: "Monday", time: "11:15 AM - 12:10 PM", floor: "4", room: "LAB-2", subject: "FWD LAB" },
+      { day: "Monday", time: "12:10 PM - 1:05 PM", floor: "2", room: "210", subject: "COA" },
+      { day: "Monday", time: "2:00 PM - 2:55 PM", floor: "2", room: "210", subject: "SDM" },
+      { day: "Monday", time: "2:55 PM - 3:50 PM", floor: "2", room: "210", subject: "SDM" },
+
+      { day: "Tuesday", time: "8:00 AM - 8:55 AM", floor: "nil", room: "nil", subject: "nil" },
+      { day: "Tuesday", time: "8:55 AM - 9:50 AM", floor: "2", room: "210", subject: "COA" },
+      { day: "Tuesday", time: "10:20 AM - 11:15 AM", floor: "2", room: "210", subject: "DS" },
+      { day: "Tuesday", time: "11:15 AM - 12:10 PM", floor: "2", room: "210", subject: "SDM" },
+      { day: "Tuesday", time: "12:10 PM - 1:05 PM", floor: "2", room: "210", subject: "LD" },
+
+      { day: "Wednesday", time: "8:00 AM - 8:55 AM", floor: "4", room: "OOJ LAB", subject: "OOJ LAB" },
+      { day: "Wednesday", time: "8:55 AM - 9:50 AM", floor: "4", room: "OOJ LAB", subject: "OOJ LAB" },
+      { day: "Wednesday", time: "10:20 AM - 11:15 AM", floor: "2", room: "210", subject: "COA" },
+      { day: "Wednesday", time: "11:15 AM - 12:10 PM", floor: "2", room: "210", subject: "OOJ" },
+      { day: "Wednesday", time: "12:10 PM - 1:05 PM", floor: "nil", room: "nil", subject: "Proctor Meet" },
+
+      { day: "Thursday", time: "8:00 AM - 8:55 AM", floor: "4", room: "404", subject: "LD" },
+      { day: "Thursday", time: "8:55 AM - 9:50 AM", floor: "4", room: "404", subject: "SDM" },
+      { day: "Thursday", time: "10:20 AM - 11:15 AM", floor: "5", room: "DS LAB", subject: "DS LAB" },
+      { day: "Thursday", time: "11:15 AM - 12:10 PM", floor: "5", room: "DS LAB", subject: "DS LAB" },
+      { day: "Thursday", time: "12:10 PM - 1:05 PM", floor: "4", room: "403", subject: "OOJ" },
+
+      { day: "Friday", time: "8:00 AM - 8:55 AM", floor: "4", room: "LAB", subject: "DBMS LAB" },
+      { day: "Friday", time: "8:55 AM - 9:50 AM", floor: "4", room: "LAB", subject: "DBMS LAB" },
+      { day: "Friday", time: "10:20 AM - 11:15 AM", floor: "2", room: "210", subject: "DBMS" },
+      { day: "Friday", time: "11:15 AM - 12:10 PM", floor: "2", room: "210", subject: "OOJ" },
+      { day: "Friday", time: "12:10 PM - 1:05 PM", floor: "2", room: "210", subject: "DS" },
+
+      { day: "Saturday", time: "8:00 AM - 8:55 AM", floor: "2", room: "210", subject: "DBMS" },
+      { day: "Saturday", time: "8:55 AM - 9:50 AM", floor: "2", room: "210", subject: "DBMS" },
+      { day: "Saturday", time: "10:20 AM - 11:15 AM", floor: "2", room: "210", subject: "USP Tutorial" },
+      { day: "Saturday", time: "11:15 AM - 12:10 PM", floor: "2", room: "210", subject: "USP Tutorial" },
+      { day: "Saturday", time: "12:10 PM - 1:05 PM", floor: "nil", room: "nil", subject: "nil" }
+    ];
+
+    function parseTime(timeStr) {
+      const [time, meridian] = timeStr.split(" ");
+      let [hours, minutes] = time.split(":").map(Number);
+      if (meridian === "PM" && hours !== 12) hours += 12;
+      if (meridian === "AM" && hours === 12) hours = 0;
+      return { hours, minutes };
+    }
+    function toMinutes(time) { return time.hours * 60 + time.minutes; }
+    function isNow(timeRange) {
+      const [startStr, endStr] = timeRange.split(" - ");
+      const start = parseTime(startStr);
+      const end = parseTime(endStr);
+      const now = new Date();
+      const currentMinutes = now.getHours() * 60 + now.getMinutes();
+      return currentMinutes >= toMinutes(start) && currentMinutes <= toMinutes(end);
+    }
+
+    function getSubjectClass(sub) {
+      if (!sub) return "";
+      const key = sub.replace(/\s+/g,"").toUpperCase();
+      if (key.includes("OOJ")) return "subject-OOJ";
+      if (key.includes("DS")) return "subject-DS";
+      if (key.includes("SDM")) return "subject-SDM";
+      if (key.includes("COA")) return "subject-COA";
+      if (key.includes("DBMS")) return "subject-DBMS";
+      if (key.includes("LD")) return "subject-LD";
+      if (key.includes("USP")) return "subject-USP";
+      if (key.includes("FWD")) return "subject-FWDLAB";
+      return "";
+    }
+
+    function showHome() {
+      const today = new Date().toLocaleDateString("en-US", { weekday: "long" });
+      const now = new Date();
+      const currentMinutes = now.getHours() * 60 + now.getMinutes();
+      let currentClass = null, upcomingClass = null;
+
+      schedule.forEach(cls => {
+        if (cls.day === today && isNow(cls.time)) currentClass = cls;
+        if (cls.day === today) {
+          const [startStr] = cls.time.split(" - ");
+          const start = parseTime(startStr);
+          if (toMinutes(start) > currentMinutes) {
+            if (!upcomingClass || toMinutes(start) < toMinutes(parseTime(upcomingClass.time.split(" - ")[0]))) {
+              upcomingClass = cls;
+            }
+          }
+        }
+      });
+
+      let html = `<div class="card"><h2>📌 Today: ${today}</h2>`;
+      if (currentClass) {
+        html += `<p class="${getSubjectClass(currentClass.subject)}"><b>Current Class:</b> ${currentClass.subject}<br>⏰ ${currentClass.time}<br>🏫 Room ${currentClass.room}, Floor ${currentClass.floor}</p>`;
+      } else {
+        html += `<p>No ongoing class right now 🎉</p>`;
+      }
+      if (upcomingClass) {
+        html += `<p class="${getSubjectClass(upcomingClass.subject)}"><b>Next Class:</b> ${upcomingClass.subject}<br>⏰ ${upcomingClass.time}<br>🏫 Room ${upcomingClass.room}, Floor ${upcomingClass.floor}</p>`;
+      }
+      html += `</div>`;
+      document.getElementById("content").innerHTML = html;
+    }
+
+    function showDay(day) {
+      let rows = schedule.filter(cls => cls.day === day).map(cls => `
+        <tr class="${isNow(cls.time) && cls.day === new Date().toLocaleDateString("en-US",{weekday:"long"}) ? "highlight" : ""}">
+          <td>${cls.time}</td>
+          <td class="${getSubjectClass(cls.subject)}">${cls.subject}</td>
+          <td>${cls.room}</td>
+          <td>${cls.floor}</td>
+        </tr>
+      `).join("");
+      document.getElementById("content").innerHTML = `
+        <div class="card">
+          <h2>📅 ${day}</h2>
+          <table>
+            <tr><th>Time</th><th>Subject</th><th>Room</th><th>Floor</th></tr>
+            ${rows}
+          </table>
+        </div>`;
+    }
+
+    showHome();
+  </script>
+
+</body>
+</html>
